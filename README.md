@@ -65,7 +65,7 @@ MusiCloud 는 Creator 가 만드는 새로운 음악에 대한 저작권 승인�
 
 ## AS-IS 조직 (Horizontally-Aligned)
 
-![image](https://user-images.githubusercontent.com/75309297/106628829-8c2e4900-65bd-11eb-8360-ed2df27854e0.png)
+![image](https://user-images.githubusercontent.com/6468351/106836030-bbd37300-66db-11eb-9c32-7913c6337c28.png)
 
 ## TO-BE 조직 (Vertically-Aligned)
 
