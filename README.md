@@ -171,7 +171,7 @@ gateway > resources > applitcation.yml 설정
 gateway 테스트
 
 ```bash
-http POST http://gateway:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIC 1st Annyversary"
+http POST http://gateway:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIK 1st Anniversary"
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98183284-2d6c1b80-1f4b-11eb-90ad-c95c4df1f36a.png)
 
