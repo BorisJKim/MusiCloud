@@ -17,6 +17,11 @@ public class Content {
     private String description;
     private Long sourceId;
     private String status;
+    
+    @PrePersist
+    public void onPrePersist() {
+        this.setStatus("Uploaded");
+    }
 
     @PostPersist
     public void onPostPersist(){
