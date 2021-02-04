@@ -20,6 +20,12 @@ spec:
           image: musicloud.azurecr.io/copyright:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: configurl
+              valueFrom:
+                configMapKeyRef:
+                  name: apicopyrighturl
+                  key: url
           readinessProbe:
             httpGet:
               path: '/actuator/health'
