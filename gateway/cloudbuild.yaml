@@ -58,6 +58,7 @@ steps:
         kind: Deployment
         metadata:
           name: $_PROJECT_NAME
+          namespace: musicloud
           labels:
             app: $_PROJECT_NAME
         spec:
@@ -75,6 +76,12 @@ steps:
                   image: gcr.io/$PROJECT_ID/$_PROJECT_NAME:$COMMIT_SHA
                   ports:
                     - containerPort: 8080
+                  env:
+                    - name: configurl
+                      valueFrom:
+                        configMapKeyRef:
+                          name: apigatewayurl
+                          key: url
         EOF
 substitutions:
     _PROJECT_NAME: gateway
