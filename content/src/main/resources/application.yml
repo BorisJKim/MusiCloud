@@ -31,12 +31,25 @@ spring:
           destination: musicloud
           contentType: application/json
 
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    default:
+      execution.isolation.thread.timeoutInMilliseconds: 610
+
 logging:
   level:
     org.hibernate.type: trace
     org.springframework.cloud: debug
 server:
   port: 8081
+
+api:
+  url:
+    pay: http://localhost:8083
 ---
 
 spring:
@@ -62,3 +75,16 @@ spring:
         event-out:
           destination: musicloud
           contentType: application/json
+
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    default:
+      execution.isolation.thread.timeoutInMilliseconds: 610
+
+api:
+  url:
+    pay: ${configurl}
