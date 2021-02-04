@@ -29,7 +29,7 @@ public class PolicyHandler{
             Optional<Content> contentOptional = contentRepository.findById(registered.getContentId());
             Content content = contentOptional.get();
             content.setSourceId(registered.getId());
-            content.setStatus("Source Registered.");
+            content.setStatus("Registered");
             contentRepository.save(content);
         }
     }
@@ -41,7 +41,7 @@ public class PolicyHandler{
             
             Optional<Content> contentOptional = contentRepository.findById(recovered.getContentId());
             Content content = contentOptional.get();
-            content.setStatus("Copyright Recovered.");
+            content.setStatus("Recovered");
             contentRepository.save(content);
         }
     }
