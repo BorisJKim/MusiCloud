@@ -21,6 +21,7 @@ public class Content {
     @PostPersist
     public void onPostPersist(){
         System.out.println("******** Content ********");
+        this.setStatus("Content Uploaded.");
         
         Uploaded uploaded = new Uploaded();
         uploaded.setId(this.getId());
@@ -29,7 +30,7 @@ public class Content {
         uploaded.setType(this.getType());
         uploaded.setDescription(this.getDescription());
         uploaded.setSourceId(this.getSourceId());
-        uploaded.setStatus("Content Uploaded.");
+        uploaded.setStatus(this.getStatus());
         BeanUtils.copyProperties(this, uploaded);
         uploaded.publishAfterCommit();
 
