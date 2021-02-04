@@ -26,6 +26,11 @@ spec:
                 configMapKeyRef:
                   name: apicontenturl
                   key: url
+            - name: configCopyrightUrl
+              valueFrom:
+                configMapKeyRef:
+                  name: apicopyrighturl
+                  key: url
           readinessProbe:
             httpGet:
               path: '/actuator/health'
