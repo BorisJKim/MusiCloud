@@ -79,14 +79,6 @@ http://www.msaez.io/#/storming/NbHnocpkJjWAo9omQbeAD61P1TA3/share/b7b210b6bd9291
 
 ![image](https://user-images.githubusercontent.com/6468351/106837643-33a29d00-66de-11eb-997f-de74c92d3846.png)
 
-### 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
-
-![image](https://user-images.githubusercontent.com/6468351/106844851-001b3f00-66ed-11eb-8cef-5cce05f055bb.png)
-
-    - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
-    - 호출관계에서 PubSub 과 Req/Resp 를 구분함
-    - 서브 도메인과 바운디드 컨텍스트의 분리:  각 팀의 KPI 별로 아래와 같이 관심 구현 스토리를 나눠가짐
-
 ### 기능적 요구사항 검증
 
 ![image](https://user-images.githubusercontent.com/75309297/106581014-bcf28c00-6585-11eb-867d-df5c2fe91896.png)
@@ -116,6 +108,15 @@ http://www.msaez.io/#/storming/NbHnocpkJjWAo9omQbeAD61P1TA3/share/b7b210b6bd9291
     - 생산취소가 되지않은 건에 대해서는 절대 주문취소를 하지 않는다. (점주가 손해보고는 못 사는 성격)
     - 재고변경(차감)이 되지않은 건에 대해서는 재고변경 프로세스가 진행되면 안된다.
     - 재료창고의 크기를 감안하여 모든 메뉴의 재고는 100개를 시작으로 차감된다.  
+
+## 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
+
+![image](https://user-images.githubusercontent.com/6468351/106844851-001b3f00-66ed-11eb-8cef-5cce05f055bb.png)
+
+    - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
+    - 호출관계에서 PubSub 과 Req/Resp 를 구분함
+    - 서브 도메인과 바운디드 컨텍스트의 분리:  각 팀의 KPI 별로 아래와 같이 관심 구현 스토리를 나눠가짐
+    - 원음 서비스의 경우 Polyglot 검증을 위해 Hsql 로 설계
 
 # 구현
 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 8084 이다)
