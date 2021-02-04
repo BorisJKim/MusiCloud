@@ -121,23 +121,23 @@ http://www.msaez.io/#/storming/NbHnocpkJjWAo9omQbeAD61P1TA3/share/b7b210b6bd9291
 # 구현
 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 8084 이다)
 
-```bash
-cd order
+```
+cd content
 mvn spring-boot:run
 
-cd product
+cd copyright
 mvn spring-boot:run 
 
-cd stock
+cd source
 mvn spring-boot:run  
 
-cd customercenter
+cd mypage
 mvn spring-boot:run  
 ```
 
 ## DDD 의 적용
 
-각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 order 마이크로 서비스). 
+각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 content 마이크로 서비스). 
 이때 가능한 현업에서 사용하는 언어(유비쿼터스 랭귀지)를 그대로 사용하려고 노력했다. 
 하지만, 일부 구현 단계에 영문이 아닌 경우는 실행이 불가능한 경우가 발생하여 영문으로 구축하였다.  
 (Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 ID 등은 한글로 식별자를 사용하는 경우 오류 발생)
@@ -150,17 +150,17 @@ Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양�
 ![2_RestRepository](https://user-images.githubusercontent.com/77084784/106618497-dd850b00-65b2-11eb-85a1-76803232a2f4.jpg)
 
 ## 폴리글랏 퍼시스턴스
-Stock MSA의 경우 H2 DB인 주문과 제작와 달리 Hsql으로 구현하여 MSA간 서로 다른 종류의 DB간에도 문제 없이 동작하여 다형성을 만족하는지 확인하였다. 
+
+source MSA의 경우 H2 DB인 content 와 copyright 와 달리 Hsql으로 구현하여 MSA간 서로 다른 종류의 DB간에도 문제 없이 동작하여 다형성을 만족하는지 확인하였다. 
 
 
-order, product, customercenter의 pom.xml 설정
+content, copyright, mypage 의 pom.xml 설정
 
 ![3_Polyglot](https://user-images.githubusercontent.com/77084784/106618577-f2fa3500-65b2-11eb-877c-f73a8364c2c3.jpg)
 
-stock의 pom.xml 설정
+source 의 pom.xml 설정
 
 ![4_Polyglot](https://user-images.githubusercontent.com/77084784/106618672-102f0380-65b3-11eb-81a9-f24d2d7f68ca.jpg)
-
 
 ## Gateway 적용
 
