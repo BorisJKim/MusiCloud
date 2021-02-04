@@ -13,6 +13,8 @@ public class Copyright {
     private Long id;
     private Long contentId;
     private String status;
+    private String artistName;
+    private String musicTitle;
 
     @PostPersist
     public void onPostPersist(){
@@ -57,6 +59,21 @@ public class Copyright {
         this.status = status;
     }
 
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
+    }
+
+    public String getMusicTitle() {
+        return musicTitle;
+    }
+
+    public void setMusicTitle(String musicTitle) {
+        this.musicTitle = musicTitle;
+    }
 
 
 
