@@ -171,9 +171,15 @@ gateway > resources > applitcation.yml 설정
 gateway 테스트
 
 ```bash
-http POST http://gateway:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIK 1st Anniversary"
+http POST http://(gateway IP):8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIK 1st Anniversary"
 ```
-![image](https://user-images.githubusercontent.com/73699193/98183284-2d6c1b80-1f4b-11eb-90ad-c95c4df1f36a.png)
+![image](https://user-images.githubusercontent.com/6468351/106902892-a9d5ec80-673c-11eb-98c8-8eb69581ff73.png)
+
+```bash
+http GET http://10.0.158.68:8080/copyrights
+```
+![image](https://user-images.githubusercontent.com/6468351/106903040-da1d8b00-673c-11eb-82e3-14c69e6ea10b.png)
+
 
 ## 동기식 호출 과 Fallback 처리
 
