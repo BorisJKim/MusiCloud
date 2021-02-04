@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Date;
 
-@FeignClient(name="copyright", url="${api.copyright.url}")
+@FeignClient(name="copyright", url="${api.url.copyright}")
 public interface CopyrightService {
 
     @RequestMapping(method= RequestMethod.POST, path="/copyrights")
