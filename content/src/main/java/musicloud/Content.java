@@ -38,6 +38,8 @@ public class Content {
 
         musicloud.external.Copyright copyright = new musicloud.external.Copyright();
         copyright.setContentId(this.getId());
+        copyright.setArtistName(this.getCreatorName());
+        copyright.setMusicTitle(this.getTitle());
         copyright.setStatus("Copyright Approval Process Started.");
         // mappings goes here
         ContentApplication.applicationContext.getBean(musicloud.external.CopyrightService.class)
