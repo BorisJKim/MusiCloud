@@ -29,7 +29,7 @@ public class Content {
         uploaded.setType(this.getType());
         uploaded.setDescription(this.getDescription());
         uploaded.setSourceId(this.getSourceId());
-        uploaded.setStatus(this.getStatus());
+        uploaded.setStatus("Content Uploaded.");
         BeanUtils.copyProperties(this, uploaded);
         uploaded.publishAfterCommit();
 
