@@ -18,7 +18,7 @@ public class Copyright {
 
     @PostPersist
     public void onPostPersist(){
-        this.setStatus("Copyright Approved.");
+        this.setStatus("Approved");
         Approved approved = new Approved();
         BeanUtils.copyProperties(this, approved);
         approved.publishAfterCommit();
@@ -28,7 +28,7 @@ public class Copyright {
 
     @PostUpdate
     public void onPostUpdate(){
-        this.setStatus("Copyright Recovered.");
+        this.setStatus("Recovered");
         Recovered recovered = new Recovered();
         BeanUtils.copyProperties(this, recovered);
         recovered.publishAfterCommit();
