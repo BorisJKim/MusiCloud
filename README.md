@@ -166,12 +166,12 @@ source 의 pom.xml 설정
 
 gateway > resources > applitcation.yml 설정
 
-![5_Gateway](https://user-images.githubusercontent.com/77084784/106618782-3359b300-65b3-11eb-8937-86256d327971.jpg)
+![image](https://user-images.githubusercontent.com/6468351/106861178-c5270480-6708-11eb-96a9-b53a3fd5cd9a.png)
 
 gateway 테스트
 
 ```bash
-http POST http://10.0.232.104:8080/orders productName="Americano" qty=1
+http POST http://gateway:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIC 1st Annyversary"
 ```
 ![6_Gateway](https://user-images.githubusercontent.com/77084784/106618857-4b313700-65b3-11eb-83aa-c9f04a28683b.jpg)
 
