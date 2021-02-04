@@ -32,7 +32,7 @@ public class Content {
         uploaded.setSourceId(this.getSourceId());
         uploaded.setStatus(this.getStatus());
         BeanUtils.copyProperties(this, uploaded);
-        uploaded.publishAfterCommit();
+        uploaded.publish();
 
         //Following code causes dependency to external APIs
         // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
@@ -54,7 +54,7 @@ public class Content {
         this.setStatus("Deleted");
         Deleted deleted = new Deleted();
         BeanUtils.copyProperties(this, deleted);
-        deleted.publishAfterCommit();
+        deleted.publish();
         
     }
 
