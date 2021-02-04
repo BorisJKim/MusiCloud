@@ -81,7 +81,7 @@ http://www.msaez.io/#/storming/NbHnocpkJjWAo9omQbeAD61P1TA3/share/b7b210b6bd9291
 
 ### 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
-![image](https://user-images.githubusercontent.com/75309297/106578384-cb8b7400-6582-11eb-95ec-55ba8da71a64.png)
+![image](https://user-images.githubusercontent.com/6468351/106844851-001b3f00-66ed-11eb-8cef-5cce05f055bb.png)
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
     - 호출관계에서 PubSub 과 Req/Resp 를 구분함
