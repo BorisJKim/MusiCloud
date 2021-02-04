@@ -81,33 +81,33 @@ http://www.msaez.io/#/storming/NbHnocpkJjWAo9omQbeAD61P1TA3/share/b7b210b6bd9291
 
 ### 기능적 요구사항 검증
 
-![image](https://user-images.githubusercontent.com/75309297/106581014-bcf28c00-6585-11eb-867d-df5c2fe91896.png)
+![image](https://user-images.githubusercontent.com/6468351/106846504-5178fd80-66f0-11eb-8396-2ad20d946e7a.png)
 
-    - 고객이 커피를 주문한다. (OK)
-    - 커피가 만들어진다. (OK)
-    - 커피가 만들어 지면 재고가 Stock에 전달된다. (OK)
+    - Creator 가 Content 를 Update 한다. (OK)
+    - Copyright 의 Approve 절차가 진행된다. (OK)
+    - Copyright 가 Approved 되면 저작권 승인 정보가 음원 서비스에 전달된다. (OK)
+    - 음원 서비스에 저작권 승인 정보가 도착하면 Source 를 Register 한다. (OK)
+    - Registered 되면 Creator 가 등록 상태를 조회할 수 있다. (OK)
     
-![image](https://user-images.githubusercontent.com/75309297/106581647-6d609000-6586-11eb-88ce-cf81b4681b47.png)
+![image](https://user-images.githubusercontent.com/6468351/106846516-576ede80-66f0-11eb-84d2-04f648d071ad.png)
 
-    - 고객이 커피를 주문한다. (OK)
-    - 커피가 만들어진다. (OK)
-    - 커피가 생산이 완료되면 고객이 order에서 조회 할 수 있다.(OK)
+    - Creator 가 Content 를 Delete 할 수 있다. (OK)
+    - Content 가 Deleted 되면 Copyright 가 해제된다. (OK)
+    - Creator 가 해제 상태를 조회할 수 있다. (OK)
       
-![image](https://user-images.githubusercontent.com/75309297/106582664-96cdeb80-6587-11eb-8a21-d7f7aba5492d.png)
+![image](https://user-images.githubusercontent.com/6468351/106846525-5b026580-66f0-11eb-8756-9c8140ecdd99.png)
 
-    - 고객이 주문을 취소할 수 있다.(OK)
-    - 주문이 취소되면 커피생산을 취소한다.(OK)
-    - 고객이 order에서 조회 할 수 있다. (OK)
-
-![image](https://user-images.githubusercontent.com/75309297/106582947-e7454900-6587-11eb-8819-d65f48ae10bd.png)
-
-    - 고객이 MyPage에서 커피주문 내역을 볼 수 있어야 한다.(OK)
+    - Creator 가 모든 진행 상태를 볼 수 있어야 한다. (OK)
        
-### 비기능 요구사항
+### 비기능적 요구사항 검증
 
-    - 생산취소가 되지않은 건에 대해서는 절대 주문취소를 하지 않는다. (점주가 손해보고는 못 사는 성격)
-    - 재고변경(차감)이 되지않은 건에 대해서는 재고변경 프로세스가 진행되면 안된다.
-    - 재료창고의 크기를 감안하여 모든 메뉴의 재고는 100개를 시작으로 차감된다.  
+![image](https://user-images.githubusercontent.com/6468351/106846531-5e95ec80-66f0-11eb-83c2-c5f90ae4a5cc.png)
+
+    - 1) Copyright 가 Approved 되지 않은 Content 는 아예 음원 등록이 성립되지 않아야 한다. (Req/Res)
+    - 2) 음원 서비스 기능이 수행되지 않더라도 Content 서비스는 365일 24시간 받을 수 있어야 한다. (Pub/Sub)
+    - 3) 저작권 관리 시스템이 과중되면 저작권 신청을 잠시동안 받지 않고 승인을 잠시 후에 하도록 유도한다. (Circuit Breaker)
+    - 4) Content 가 삭제되면 저작권이 해제되고 Content 정보에 업데이트가 되어야 한다. (SAGA, 보상 트랜잭션)
+    - 5) Creator 가 모든 진행 상태를 조회할 수 있도록 성능을 고려하여 별도의 View 로 구성한다. (CQRS, DML/Select 분리)
 
 ## 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
