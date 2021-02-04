@@ -33,6 +33,7 @@ public class PolicyHandler{
             contentRepository.save(content);
         }
     }
+    
     @StreamListener(KafkaProcessor.INPUT)
     public void wheneverRecovered_ContentStatus(@Payload Recovered recovered){
 
@@ -42,6 +43,19 @@ public class PolicyHandler{
             Optional<Content> contentOptional = contentRepository.findById(recovered.getContentId());
             Content content = contentOptional.get();
             content.setStatus("Recovered");
+            contentRepository.save(content);
+        }
+    }
+
+    @StreamListener(KafkaProcessor.INPUT)
+    public void wheneverApproved_ContentStatus(@Payload Approved approved){
+
+        if(approved.isMe()){
+            System.out.println("##### listener  : " + approved.toJson());
+            
+            Optional<Content> contentOptional = contentRepository.findById(approved.getContentId());
+            Content content = contentOptional.get();
+            content.setStatus("Approved");
             contentRepository.save(content);
         }
     }
