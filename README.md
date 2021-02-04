@@ -233,24 +233,24 @@ copyright 가 approved 된 후에 source 서비스로 이를 알려주는 행위
 ![image](https://user-images.githubusercontent.com/6468351/106910662-c9711300-6744-11eb-9169-8c3bbd05455b.png)
 
 
-대리점(store)시스템은 주문(app)/결제(pay)와 완전히 분리되어있으며(sync transaction 없음), 이벤트 수신에 따라 처리되기 때문에, 대리점(store)이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
+source 시스템은 content / copyright 와 완전히 분리되어있으며(sync transaction 없음), 이벤트 수신에 따라 처리되기 때문에, source 시스템이 유지보수로 인해 잠시 내려간 상태라도 content 시스템 이용에는 문제가 없다.(시간적 디커플링):
 ```
-# 대리점(store) 서비스를 잠시 내려놓음 (ctrl+c)
+# source 서비스를 잠시 내려놓음 (ctrl+c)
 
-#주문하기(order)
-http http://localhost:8081/orders item=note30 qty=2  #Success
+# upload (Success)
+http POST http://10.0.158.68:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIK 1st Annyversary"
 
-#주문상태 확인
-http get http://localhost:8081/orders    # 상태값이 'Shipped'이 아닌 'Payed'에서 멈춤을 확인
+# 상태 확인
+http GET http://10.0.158.68:8080/contents    # 상태값이 'Registered' 가 아닌 'Approved' 에서 멈춤을 확인
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98078301-2b577d80-1eb5-11eb-9d89-7c03a3fa27dd.png)
 ```
-#대리점(store) 서비스 기동
-cd store
+# source 서비스 기동
+cd source
 mvn spring-boot:run
 
-#주문상태 확인
-http get http://localhost:8081/orders     # 'Payed' 였던 상태값이 'Shipped'로 변경된 것을 확인
+# 상태 확인
+http GET http://localhost:8081/contents     # 'Approved' 였던 상태값이 'Registered'로 변경된 것을 확인
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98078837-2cd57580-1eb6-11eb-8850-a8c621410d61.png)
 
@@ -258,59 +258,7 @@ http get http://localhost:8081/orders     # 'Payed' 였던 상태값이 'Shipped
 
 ## Deploy / Pipeline
 
-- 네임스페이스 만들기
-```
-kubectl create ns phone82
-kubectl get ns
-```
-![image](https://user-images.githubusercontent.com/73699193/97960790-6d20ef00-1df5-11eb-998d-d5591975b5d4.png)
-
-- 폴더 만들기, 해당폴더로 이동
-```
-mkdir phone82
-cd phone 82
-```
-![image](https://user-images.githubusercontent.com/73699193/97961127-0ea84080-1df6-11eb-81b3-1d5e460d4c0f.png)
-
-- 소스 가져오기
-```
-git clone https://github.com/phone82/app.git
-```
-![image](https://user-images.githubusercontent.com/73699193/98089346-eb4cc680-1ec5-11eb-9c23-f6987dee9308.png)
-
-- 빌드하기
-```
-cd app
-mvn package -Dmaven.test.skip=true
-```
-![image](https://user-images.githubusercontent.com/73699193/98089442-19320b00-1ec6-11eb-88b5-544cd123d62a.png)
-
-- 도커라이징: Azure 레지스트리에 도커 이미지 푸시하기
-```
-az acr build --registry admin02 --image admin02.azurecr.io/app:latest .
-```
-![image](https://user-images.githubusercontent.com/73699193/98089685-6dd58600-1ec6-11eb-8fb9-80705c854c7b.png)
-
-- 컨테이너라이징: 디플로이 생성 확인
-```
-kubectl create deploy app --image=admin02.azurecr.io/app:latest -n phone82
-kubectl get all -n phone82
-```
-![image](https://user-images.githubusercontent.com/73699193/98090560-83977b00-1ec7-11eb-9770-9cfe1021f0b4.png)
-
-- 컨테이너라이징: 서비스 생성 확인
-```
-kubectl expose deploy app --type="ClusterIP" --port=8080 -n phone82
-kubectl get all -n phone82
-```
-![image](https://user-images.githubusercontent.com/73699193/98090693-b80b3700-1ec7-11eb-959e-fc0ce94663aa.png)
-
-- pay, store, customer, gateway에도 동일한 작업 반복
-
-
-
-
--(별첨)deployment.yml을 사용하여 배포 
+- deployment.yml을 사용하여 배포 
 
 - deployment.yml 편집
 ```
@@ -324,9 +272,11 @@ resource 설정 (autoscaling)
 
 - deployment.yml로 서비스 배포
 ```
-cd app
+cd content
 kubectl apply -f kubernetes/deployment.yml
 ```
+
+- gateway 의 경우 deployment.yml 이 없으므로 따로 배포
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
