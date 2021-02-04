@@ -75,9 +75,9 @@ MusiCloud 는 Creator 가 만드는 새로운 음악에 대한 저작권 승인�
 MSAEZ로 모델링한 이벤트스토밍 결과
 http://www.msaez.io/#/storming/NbHnocpkJjWAo9omQbeAD61P1TA3/share/b7b210b6bd9291be0cfbce1167617033
 
-### 모델 구조
+### 완성된 모델 구조
 
-![image](https://user-images.githubusercontent.com/75309297/106566105-32089600-6573-11eb-93cf-3a1fd5fea7b5.png)
+![image](https://user-images.githubusercontent.com/6468351/106837643-33a29d00-66de-11eb-997f-de74c92d3846.png)
 
 ### 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
