@@ -10,16 +10,28 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PolicyHandler{
+    
+    @Autowired
+    SourceRepository sourceRepository;
+    
     @StreamListener(KafkaProcessor.INPUT)
     public void onStringEventListener(@Payload String eventString){
 
     }
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverApproved_(@Payload Approved approved){
+    public void wheneverApproved_Register(@Payload Approved approved){
 
         if(approved.isMe()){
             System.out.println("##### listener  : " + approved.toJson());
+            System.out.println("source_policy_approved_register");
+            
+            Source source = new Source();
+            source.setContentId(approved.getContentId());
+            source.setArtistName(approved.getArtistName());
+            source.setMusicTitle(approved.getMusicTitle());
+            source.setStatus("Registered");
+            sourceRepository.save(source);
         }
     }
 
