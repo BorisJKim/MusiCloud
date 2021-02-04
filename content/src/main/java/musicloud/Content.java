@@ -40,7 +40,7 @@ public class Content {
         copyright.setContentId(this.getId());
         copyright.setStatus("Copyright Approval Process Started.");
         // mappings goes here
-        Application.applicationContext.getBean(.external.CopyrightService.class)
+        ContentApplication.applicationContext.getBean(musicloud.external.CopyrightService.class)
             .approve(copyright);
 
 
