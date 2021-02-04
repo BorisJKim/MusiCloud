@@ -49,7 +49,7 @@ server:
 
 api:
   url:
-    pay: http://localhost:8083
+    content: http://localhost:8081
 ---
 
 spring:
@@ -87,4 +87,4 @@ hystrix:
 
 api:
   url:
-    pay: ${configurl}
+    content: ${configurl}
