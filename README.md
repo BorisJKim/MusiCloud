@@ -142,12 +142,12 @@ mvn spring-boot:run
 하지만, 일부 구현 단계에 영문이 아닌 경우는 실행이 불가능한 경우가 발생하여 영문으로 구축하였다.  
 (Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 ID 등은 한글로 식별자를 사용하는 경우 오류 발생)
 
-![1_DDD](https://user-images.githubusercontent.com/77084784/106618271-9c8cf680-65b2-11eb-8408-252aa417cc56.jpg)
+![image](https://user-images.githubusercontent.com/6468351/106859522-855f1d80-6706-11eb-8337-e9c5551ac279.png)
 
 Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 
 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
 
-![2_RestRepository](https://user-images.githubusercontent.com/77084784/106618497-dd850b00-65b2-11eb-85a1-76803232a2f4.jpg)
+![image](https://user-images.githubusercontent.com/6468351/106859632-aaec2700-6706-11eb-8ba4-f425a5a84d18.png)
 
 ## 폴리글랏 퍼시스턴스
 
@@ -156,11 +156,11 @@ source MSA의 경우 H2 DB인 content 와 copyright 와 달리 Hsql으로 구현
 
 content, copyright, mypage 의 pom.xml 설정
 
-![3_Polyglot](https://user-images.githubusercontent.com/77084784/106618577-f2fa3500-65b2-11eb-877c-f73a8364c2c3.jpg)
+![image](https://user-images.githubusercontent.com/6468351/106859941-1504cc00-6707-11eb-8654-15d92dba1585.png)
 
 source 의 pom.xml 설정
 
-![4_Polyglot](https://user-images.githubusercontent.com/77084784/106618672-102f0380-65b3-11eb-81a9-f24d2d7f68ca.jpg)
+![image](https://user-images.githubusercontent.com/6468351/106860083-3fef2000-6707-11eb-9238-f3c65083b9ef.png)
 
 ## Gateway 적용
 
