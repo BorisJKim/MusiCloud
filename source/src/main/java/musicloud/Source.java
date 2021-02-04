@@ -18,9 +18,19 @@ public class Source {
 
     @PostPersist
     public void onPostPersist(){
-        Registered registered = new Registered();
-        BeanUtils.copyProperties(this, registered);
-        registered.publishAfterCommit();
+        
+        try {
+            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        if("Copyright Approved.".equals(status)) {
+            this.setStatus("Source Registered.");
+            Registered registered = new Registered();
+            BeanUtils.copyProperties(this, registered);
+            registered.publishAfterCommit();
+        }
 
 
     }
