@@ -18,22 +18,35 @@ public class Copyright {
 
     @PostPersist
     public void onPostPersist(){
-        this.setStatus("Approved");
-        Approved approved = new Approved();
-        BeanUtils.copyProperties(this, approved);
-        approved.publishAfterCommit();
-
-
+        if("Uploaded".equals(status)) {
+            setStatus("Started");
+            try {
+                Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            
+            setStatus("Approved");
+            Approved approved = new Approved();
+            BeanUtils.copyProperties(this, approved);
+            approved.publish();
+        }
+        else if("Deleted".equals(status)) {
+            this.setStatus("Recovered");
+            Recovered recovered = new Recovered();
+            BeanUtils.copyProperties(this, recovered);
+            recovered.publish();
+        }
     }
 
     @PostUpdate
     public void onPostUpdate(){
-        this.setStatus("Recovered");
-        Recovered recovered = new Recovered();
-        BeanUtils.copyProperties(this, recovered);
-        recovered.publishAfterCommit();
-
-
+        if("Deleted".equals(status)) {
+            this.setStatus("Recovered");
+            Recovered recovered = new Recovered();
+            BeanUtils.copyProperties(this, recovered);
+            recovered.publish();
+        }
     }
 
 
