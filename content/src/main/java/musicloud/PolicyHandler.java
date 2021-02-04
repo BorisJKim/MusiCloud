@@ -39,7 +39,7 @@ public class PolicyHandler{
         if(recovered.isMe()){
             System.out.println("##### listener  : " + recovered.toJson());
             
-            Optional<Content> contentOptional = contentRepository.findById(registered.getContentId());
+            Optional<Content> contentOptional = contentRepository.findById(recovered.getContentId());
             Content content = contentOptional.get();
             content.setStatus("Copyright Recovered.");
             contentRepository.save(content);
