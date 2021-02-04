@@ -14,19 +14,33 @@ public class PolicyHandler{
     public void onStringEventListener(@Payload String eventString){
 
     }
+    
+    @Autowired
+    ContentRepository contentRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverRegistered_(@Payload Registered registered){
+    public void wheneverRegistered_ContentStatus(@Payload Registered registered){
 
         if(registered.isMe()){
             System.out.println("##### listener  : " + registered.toJson());
+            
+            Optional<Content> contentOptional = contentRepository.findById(registered.getContentId());
+            Content content = contentOptional.get();
+            content.setSourceId(registered.getId());
+            content.setStatus("Source Registered.");
+            contentRepository.save(content);
         }
     }
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverRecovered_(@Payload Recovered recovered){
+    public void wheneverRecovered_ContentStatus(@Payload Recovered recovered){
 
         if(recovered.isMe()){
             System.out.println("##### listener  : " + recovered.toJson());
+            
+            Optional<Content> contentOptional = contentRepository.findById(registered.getContentId());
+            Content content = contentOptional.get();
+            content.setStatus("Copyright Recovered.");
+            contentRepository.save(content);
         }
     }
 
