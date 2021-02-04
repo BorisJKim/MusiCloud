@@ -14,12 +14,20 @@ public class PolicyHandler{
     public void onStringEventListener(@Payload String eventString){
 
     }
+    
+    @Autowired
+    CopyrightRepository copyrightRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void wheneverDeleted_(@Payload Deleted deleted){
+    public void wheneverDeleted_CopyrightRecover(@Payload Deleted deleted){
 
         if(deleted.isMe()){
             System.out.println("##### listener  : " + deleted.toJson());
+            
+            Copyright copyright = new Copyright();
+            copyright.setContentId(deleted.getId());
+            copyright.setStatus("Content Deleted.");
+            copyrightRepository.save(copyright);
         }
     }
 
