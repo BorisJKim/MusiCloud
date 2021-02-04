@@ -7,9 +7,6 @@ import java.util.List;
 
 public interface MypageRepository extends CrudRepository<Mypage, Long> {
 
-    List<> findByContentId(Long contentId);
-    List<> findByContentId(Long contentId);
-    List<> findByContentId(Long contentId);
-    List<> findByContentId(Long contentId);
+    List<Mypage> findByContentId(Long contentId);
 
 }
