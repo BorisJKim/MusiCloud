@@ -11,7 +11,7 @@ import java.util.Date;
 @FeignClient(name="copyright", url="${api.url.copyright}")
 public interface CopyrightService {
 
-    @RequestMapping(method= RequestMethod.POST, path="/copyrights")
-    public void approve(@RequestBody Copyright copyright);
+    @RequestMapping(method= RequestMethod.POST, path="/copyrights/{id}")
+    public void approve(@PathVariable("id") Long copyrightId, @RequestBody Copyright copyright);
 
 }
