@@ -20,14 +20,25 @@ public class Content {
 
     @PostPersist
     public void onPostPersist(){
+        System.out.println("******** Content ********");
+        
         Uploaded uploaded = new Uploaded();
+        uploaded.setId(this.getId());
+        uploaded.setCreatorName(this.getCreatorName());
+        uploaded.setTitle(this.getTitle());
+        uploaded.setType(this.getType());
+        uploaded.setDescription(this.getDescription());
+        uploaded.setSourceId(this.getSourceId());
+        uploaded.setStatus(this.getStatus());
         BeanUtils.copyProperties(this, uploaded);
         uploaded.publishAfterCommit();
 
         //Following code causes dependency to external APIs
         // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
 
-        .external.Copyright copyright = new .external.Copyright();
+        musicloud.external.Copyright copyright = new musicloud.external.Copyright();
+        copyright.setContentId(this.getId());
+        copyright.setStatus("Copyright Approval Process Started.");
         // mappings goes here
         Application.applicationContext.getBean(.external.CopyrightService.class)
             .approve(copyright);
@@ -37,11 +48,11 @@ public class Content {
 
     @PreRemove
     public void onPreRemove(){
+        this.setStatus("Content Deleted.");
         Deleted deleted = new Deleted();
         BeanUtils.copyProperties(this, deleted);
         deleted.publishAfterCommit();
-
-
+        
     }
 
 
