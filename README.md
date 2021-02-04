@@ -173,162 +173,185 @@ gateway 테스트
 ```bash
 http POST http://gateway:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIC 1st Annyversary"
 ```
-![6_Gateway](https://user-images.githubusercontent.com/77084784/106618857-4b313700-65b3-11eb-83aa-c9f04a28683b.jpg)
-
+![image](https://user-images.githubusercontent.com/73699193/98183284-2d6c1b80-1f4b-11eb-90ad-c95c4df1f36a.png)
 
 ## 동기식 호출 과 Fallback 처리
 
-분석단계에서의 조건 중 하나로 제품(product) -> 제고(stock) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 
+분석단계에서의 조건 중 하나로 주문(app)->결제(pay) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 
 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
 
-- 서비스를 호출하기 위하여 FeignClient 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
-``` java
-// (app) external > StockService.java
+- 결제서비스를 호출하기 위하여 FeignClient 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
+```
+# (app) external > PaymentService.java
 
-package msacoffeechainsample.external;
+package phoneseller.external;
 
-@FeignClient(name="stock", url="${api.stock.url}")
-public interface StockService {
+@FeignClient(name="pay", url="${api.pay.url}")
+public interface PaymentService {
 
-    @RequestMapping(method= RequestMethod.POST, path="/stocks/reduce")
-    public boolean reduce(@RequestBody Stock stock);
+    @RequestMapping(method= RequestMethod.POST, path="/payments")
+    public void pay(@RequestBody Payment payment);
 
 }
 ```
-![7_동기호출](https://user-images.githubusercontent.com/77084784/106619020-7caa0280-65b3-11eb-9c88-32ea7e810f58.jpg)
+![image](https://user-images.githubusercontent.com/73699193/98065833-b1190000-1e98-11eb-9e44-84d4961011ed.png)
 
-- 주문 취소 시 제고 변경을 먼저 요청하도록 처리
-```java
-// (app) Order.java (Entity)
 
-    @PreUpdate
-    public void onPreUpdate(){
+- 주문을 받은 직후 결제를 요청하도록 처리
+```
+# (app) Order.java (Entity)
 
-       msacoffeechainsample.external.Product product = new msacoffeechainsample.external.Product();
-       product.setId(orderCanceled.getProductId());
-       product.setOrderId(orderCanceled.getId());
-       product.setProductName(orderCanceled.getProductName());
-       product.setStatus(orderCanceled.getStatus());
-       product.setQty(orderCanceled.getQty());
+    @PostPersist
+    public void onPostPersist(){
+
+       phoneseller.external.Payment payment = new phoneseller.external.Payment();
+        payment.setOrderId(this.getId());
+        payment.setProcess("Ordered");
         
-       // req/res
-       OrderApplication.applicationContext.getBean(msacoffeechainsample.external.ProductService.class)
-                    .cancel(product.getId(), product);
+        AppApplication.applicationContext.getBean(phoneseller.external.PaymentService.class)
+            .pay(payment);
     }
 ```
-![8_Req_Res](https://user-images.githubusercontent.com/77084784/106619124-99463a80-65b3-11eb-827d-bae3d43ccfe7.jpg)
+![image](https://user-images.githubusercontent.com/73699193/98066539-a6f80100-1e9a-11eb-8dd8-bf213d90e5fb.png)
 
-- 동기식 호출이 적용되서 제품 서비스에 장애가 나면 주문 서비스도 못받는다는 것을 확인:
+- 동기식 호출이 적용되서 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
 
-```bash
-#제품(product) 서비스를 잠시 내려놓음 (ctrl+c)
-
-#주문취소 (order)
-http PATCH http://localhost:8081/orders/1 status="Canceled"    #Fail
 ```
-![9_cancel_fail](https://user-images.githubusercontent.com/77084784/106677389-067dbe00-65fc-11eb-8309-12ba029321d9.jpg)
+#결제(pay) 서비스를 잠시 내려놓음 (ctrl+c)
 
-```bash
-#제품(product) 서비스 재기동
-cd product
+#주문하기(order)
+http http://localhost:8081/orders item=note20 qty=1   #Fail
+```
+![image](https://user-images.githubusercontent.com/73699193/98072284-04934a00-1ea9-11eb-9fad-40d3996e109f.png)
+
+```
+#결제(pay) 서비스 재기동
+cd pay
 mvn spring-boot:run
 
-#주문취소 (order)
-http PATCH http://localhost:8081/orders/2 status="Canceled"    #Success
+#주문하기(order)
+http http://localhost:8081/orders item=note21 qty=2   #Success
 ```
-![9_cancel_ok](https://user-images.githubusercontent.com/77084784/106677460-1eedd880-65fc-11eb-8470-4b8c0b170c8f.jpg)
+![image](https://user-images.githubusercontent.com/73699193/98074359-9f8e2300-1ead-11eb-8854-0449a65ff55c.png)
 
 
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 
 
 
-주문(order)이 이루어진 후에 제품(product)로 이를 알려주는 행위는 비 동기식으로 처리하여 제품(product)의 처리를 위하여 주문이 블로킹 되지 않아도록 처리한다.
+결제(pay)가 이루어진 후에 대리점(store)으로 이를 알려주는 행위는 비 동기식으로 처리하여 대리점(store)의 처리를 위하여 결제주문이 블로킹 되지 않아도록 처리한다.
  
-- 주문이 되었다(Ordered)는 도메인 이벤트를 카프카로 송출한다(Publish)
+- 결제승인이 되었다(payCompleted)는 도메인 이벤트를 카프카로 송출한다(Publish)
  
-![10_비동기 호출(주문_제조)](https://user-images.githubusercontent.com/77084784/106619371-e0343000-65b3-11eb-9599-ca40b275751b.jpg)
+![image](https://user-images.githubusercontent.com/73699193/98075277-6f478400-1eaf-11eb-88c8-2b4a7736e56b.png)
 
-- 제품(product)에서는 주문(ordered) 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다.
-- 주문접수(Order)는 송출된 주문완료(ordered) 정보를 제품(product)의 Repository에 저장한다.:
- 
-![11_비동기 호출(주문_제조)](https://user-images.githubusercontent.com/77084784/106619501-01951c00-65b4-11eb-88e9-8870bad805f7.jpg)
 
-제품(product) 시스템은 주문(order)/제고(stock)와 완전히 분리되어있으며(sync transaction 없음), 이벤트 수신에 따라 처리되기 때문에, 제품(product)이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
-```bash
-#제품(product) 서비스를 잠시 내려놓음 (ctrl+c)
+- 대리점(store)에서는 결제승인(payCompleted) 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다.
+- 주문접수(OrderReceive)는 송출된 결제승인(payCompleted) 정보를 store의 Repository에 저장한다.:
+ 
+![image](https://user-images.githubusercontent.com/73699193/98076059-e0d40200-1eb0-11eb-94ad-c4ea114cb3aa.png)
+
+
+대리점(store)시스템은 주문(app)/결제(pay)와 완전히 분리되어있으며(sync transaction 없음), 이벤트 수신에 따라 처리되기 때문에, 대리점(store)이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
+```
+# 대리점(store) 서비스를 잠시 내려놓음 (ctrl+c)
 
 #주문하기(order)
-http http://localhost:8081/orders item="Americano" qty=1  #Success
+http http://localhost:8081/orders item=note30 qty=2  #Success
 
 #주문상태 확인
-http GET http://localhost:8081/orders/1    # 상태값이 'Completed'이 아닌 'Requested'에서 멈춤을 확인
+http get http://localhost:8081/orders    # 상태값이 'Shipped'이 아닌 'Payed'에서 멈춤을 확인
 ```
-![12_time분리_1](https://user-images.githubusercontent.com/77084784/106619595-196ca000-65b4-11eb-892e-a0ad2fa1b7f0.jpg)
-```bash
-#제품(product) 서비스 기동
-cd product
+![image](https://user-images.githubusercontent.com/73699193/98078301-2b577d80-1eb5-11eb-9d89-7c03a3fa27dd.png)
+```
+#대리점(store) 서비스 기동
+cd store
 mvn spring-boot:run
 
 #주문상태 확인
-http GET http://localhost:8081/orders/1     # 'Requested' 였던 상태값이 'Completed'로 변경된 것을 확인
+http get http://localhost:8081/orders     # 'Payed' 였던 상태값이 'Shipped'로 변경된 것을 확인
 ```
-![12_time분리_2](https://user-images.githubusercontent.com/77084784/106619700-330de780-65b4-11eb-818e-70152aba4400.jpg)
+![image](https://user-images.githubusercontent.com/73699193/98078837-2cd57580-1eb6-11eb-8850-a8c621410d61.png)
 
 # 운영
 
 ## Deploy / Pipeline
+
 - 네임스페이스 만들기
-```bash
-kubectl create ns coffee
+```
+kubectl create ns phone82
 kubectl get ns
 ```
-![kubectl_create_ns](https://user-images.githubusercontent.com/26760226/106624530-1922d380-65b9-11eb-916a-5b6956a013ad.png)
+![image](https://user-images.githubusercontent.com/73699193/97960790-6d20ef00-1df5-11eb-998d-d5591975b5d4.png)
 
-- 폴더 만들기, 해당 폴더로 이동
-``` bash
-mkdir coffee
-cd coffee
+- 폴더 만들기, 해당폴더로 이동
 ```
-![mkdir_coffee](https://user-images.githubusercontent.com/26760226/106623326-d7ddf400-65b7-11eb-92af-7b8eacb4eeb3.png)
+mkdir phone82
+cd phone 82
+```
+![image](https://user-images.githubusercontent.com/73699193/97961127-0ea84080-1df6-11eb-81b3-1d5e460d4c0f.png)
 
 - 소스 가져오기
-``` bash
-git clone https://github.com/MSACoffeeChain/main.git
 ```
-![git_clone](https://user-images.githubusercontent.com/26760226/106623315-d6143080-65b7-11eb-8bf0-b7604d2dd2db.png)
-
-- 빌드 하기
-``` bash
-cd order
-mvn package
+git clone https://github.com/phone82/app.git
 ```
-![mvn_package](https://user-images.githubusercontent.com/26760226/106623329-d7ddf400-65b7-11eb-8d1b-55ec35dfb01e.png)
+![image](https://user-images.githubusercontent.com/73699193/98089346-eb4cc680-1ec5-11eb-9c23-f6987dee9308.png)
 
-- 도커라이징 : Azure 레지스트리에 도커 이미지 푸시하기
-```bash
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/order:latest .
+- 빌드하기
 ```
-![az_acr_build](https://user-images.githubusercontent.com/26760226/106706352-e9181680-6632-11eb-8f22-0fbf80a9a575.png)
+cd app
+mvn package -Dmaven.test.skip=true
+```
+![image](https://user-images.githubusercontent.com/73699193/98089442-19320b00-1ec6-11eb-88b5-544cd123d62a.png)
 
-- 컨테이너라이징 : 디플로이 생성 확인
-```bash
+- 도커라이징: Azure 레지스트리에 도커 이미지 푸시하기
+```
+az acr build --registry admin02 --image admin02.azurecr.io/app:latest .
+```
+![image](https://user-images.githubusercontent.com/73699193/98089685-6dd58600-1ec6-11eb-8fb9-80705c854c7b.png)
+
+- 컨테이너라이징: 디플로이 생성 확인
+```
+kubectl create deploy app --image=admin02.azurecr.io/app:latest -n phone82
+kubectl get all -n phone82
+```
+![image](https://user-images.githubusercontent.com/73699193/98090560-83977b00-1ec7-11eb-9770-9cfe1021f0b4.png)
+
+- 컨테이너라이징: 서비스 생성 확인
+```
+kubectl expose deploy app --type="ClusterIP" --port=8080 -n phone82
+kubectl get all -n phone82
+```
+![image](https://user-images.githubusercontent.com/73699193/98090693-b80b3700-1ec7-11eb-959e-fc0ce94663aa.png)
+
+- pay, store, customer, gateway에도 동일한 작업 반복
+
+
+
+
+-(별첨)deployment.yml을 사용하여 배포 
+
+- deployment.yml 편집
+```
+namespace, image 설정
+env 설정 (config Map) 
+readiness 설정 (무정지 배포)
+liveness 설정 (self-healing)
+resource 설정 (autoscaling)
+```
+![image](https://user-images.githubusercontent.com/73699193/98092861-8182eb80-1eca-11eb-87c5-afa22140ebad.png)
+
+- deployment.yml로 서비스 배포
+```
+cd app
 kubectl apply -f kubernetes/deployment.yml
-kubectl get all -n coffee
 ```
-![kubectl_apply](https://user-images.githubusercontent.com/26760226/106624114-a7e32080-65b8-11eb-965b-b1323c52d58e.png)
-
-- 컨테이너라이징 : 서비스 생성 확인
-```bash
-kubectl expose deploy order --type="ClusterIP" --port=8080 -n coffee
-kubectl get all -n coffee
-```
-![kubectl_expose](https://user-images.githubusercontent.com/26760226/106623324-d7455d80-65b7-11eb-809c-165bfa828bbe.png)
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
+
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
 
-시나리오는 생산(product)-->재고(stock) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 재고 사용 요청이 과도할 경우 CB 를 통하여 장애격리.
+시나리오는 단말앱(app)-->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -344,13 +367,14 @@ hystrix:
       execution.isolation.thread.timeoutInMilliseconds: 610
 
 ```
+![image](https://user-images.githubusercontent.com/73699193/98093705-a166df00-1ecb-11eb-83b5-f42e554f7ffd.png)
 
 * siege 툴 사용법:
 ```
  siege가 생성되어 있지 않으면:
- kubectl run siege --image=apexacme/siege-nginx -n coffee
+ kubectl run siege --image=apexacme/siege-nginx -n phone82
  siege 들어가기:
- kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n coffee -- /bin/bash
+ kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n phone82 -- /bin/bash
  siege 종료:
  Ctrl + C -> exit
 ```
@@ -359,137 +383,154 @@ hystrix:
 - 60초 동안 실시
 
 ```
-siege -c10 -t60S -r10 -v --content-type "application/json" 'http://10.0.209.210:8080/products POST {"orderId":1, "status":"Requested", "productName":"Ame", "qty":1}'
+siege -c100 -t60S -r10 -v --content-type "application/json" 'http://app:8080/orders POST {"item": "abc123", "qty":3}'
 ```
-- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 stock에서 처리되면서 다시 product를 받기 시작
+- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 pay에서 처리되면서 다시 order를 받기 시작 
 
-![image](https://user-images.githubusercontent.com/6468351/106703226-31ccd100-662d-11eb-9463-a10bb211cd70.png)
+![image](https://user-images.githubusercontent.com/73699193/98098702-07eefb80-1ed2-11eb-94bf-316df4bf682b.png)
 
 - report
 
-![image](https://user-images.githubusercontent.com/6468351/106702534-da7a3100-662b-11eb-99f8-b54962eff735.png)
+![image](https://user-images.githubusercontent.com/73699193/98099047-6e741980-1ed2-11eb-9c55-6fe603e52f8b.png)
 
 - CB 잘 적용됨을 확인
 
-## 오토스케일 아웃
+
+### 오토스케일 아웃
+
+- 대리점 시스템에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
+
+```
+# autocale out 설정
+store > deployment.yml 설정
+```
+![image](https://user-images.githubusercontent.com/73699193/98187434-44fbd200-1f54-11eb-9859-daf26f812788.png)
+
+```
+kubectl autoscale deploy store --min=1 --max=10 --cpu-percent=15 -n phone82
+```
+![image](https://user-images.githubusercontent.com/73699193/98100149-ce1ef480-1ed3-11eb-908e-a75b669d611d.png)
+
+
+-
+- CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
+```
+kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n phone82 -- /bin/bash
+siege -c100 -t120S -r10 -v --content-type "application/json" 'http://store:8080/storeManages POST {"orderId":"456", "process":"Payed"}'
+```
+![image](https://user-images.githubusercontent.com/73699193/98102543-0d9b1000-1ed7-11eb-9cb6-91d7996fc1fd.png)
+
+- 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
+```
+kubectl get deploy store -w -n phone82
+```
+- 어느정도 시간이 흐른 후 스케일 아웃이 벌어지는 것을 확인할 수 있다. max=10 
+- 부하를 줄이니 늘어난 스케일이 점점 줄어들었다.
+
+![image](https://user-images.githubusercontent.com/73699193/98102926-92862980-1ed7-11eb-8f19-a673d72da580.png)
+
+- 다시 부하를 주고 확인하니 Availability가 높아진 것을 확인 할 수 있었다.
+
+![image](https://user-images.githubusercontent.com/73699193/98103249-14765280-1ed8-11eb-8c7c-9ea1c67e03cf.png)
+
 
 ## 무정지 재배포
-- 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscale 이나 CB 설정을 제거함
-- seige 로 배포작업 직전에 워크로드를 모니터링 함
-```bash
+
+* 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscale 이나 CB 설정을 제거함
+
+
+- seige 로 배포작업 직전에 워크로드를 모니터링 함.
+```
 kubectl apply -f kubernetes/deployment_readiness.yml
 ```
-- readiness 옵션이 없는 경우 배포 중 서비스 요청처리 실패 <br>
-![1](https://user-images.githubusercontent.com/26760226/106704039-bec45a00-662e-11eb-9a26-dc5d0c403d03.png)
+- readiness 옵션이 없는 경우 배포 중 서비스 요청처리 실패
 
-- deployment.yml에 readiness 옵션을 추가 <br>
-![2](https://user-images.githubusercontent.com/26760226/106704044-bff58700-662e-11eb-8842-4d1bbbead1ef.png)
+![image](https://user-images.githubusercontent.com/73699193/98105334-2a394700-1edb-11eb-9633-f5c33c5dee9f.png)
+
+
+- deployment.yml에 readiness 옵션을 추가 
+
+![image](https://user-images.githubusercontent.com/73699193/98107176-75ecf000-1edd-11eb-88df-617c870b49fb.png)
 
 - readiness적용된 deployment.yml 적용
-```bash
+
+```
 kubectl apply -f kubernetes/deployment.yml
 ```
 - 새로운 버전의 이미지로 교체
-```bash
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/customercenter:v1 .
-kubectl set image deploy customercenter customercenter=skccteam03.azurecr.io/customercenter:v1 -n coffee
 ```
+cd acr
+az acr build --registry admin02 --image admin02.azurecr.io/store:v4 .
+kubectl set image deploy store store=admin02.azurecr.io/store:v4 -n phone82
+```
+- 기존 버전과 새 버전의 store pod 공존 중
 
-- 기존 버전과 새 버전의 store pod 공존 중 <br>
-![3](https://user-images.githubusercontent.com/26760226/106704049-bff58700-662e-11eb-8199-a20723c5245d.png)
+![image](https://user-images.githubusercontent.com/73699193/98106161-65884580-1edc-11eb-9540-17a3c9bdebf3.png)
 
-- Availability: 100.00 % 확인 <br>
-![4](https://user-images.githubusercontent.com/26760226/106704050-c08e1d80-662e-11eb-9214-9136748e1336.png)
+- Availability: 100.00 % 확인
+
+![image](https://user-images.githubusercontent.com/73699193/98106524-c152ce80-1edc-11eb-8e0f-3731ca2f709d.png)
+
+
 
 ## Config Map
 
-### Service ClusterIP 확인
-![image](https://user-images.githubusercontent.com/64818523/106609778-4c5d6680-65a9-11eb-8b31-8e11b3e22162.png)
+- apllication.yml 설정
 
-### order ConfigMap 설정
-  - order/src/main/resources/apllication.yml 설정
+* default쪽
 
-  * default쪽
+![image](https://user-images.githubusercontent.com/73699193/98108335-1c85c080-1edf-11eb-9d0f-1f69e592bb1d.png)
 
-![image](https://user-images.githubusercontent.com/64818523/106609096-8ed27380-65a8-11eb-88a2-e1b732e17869.png)
+* docker 쪽
 
-  * docker 쪽
+![image](https://user-images.githubusercontent.com/73699193/98108645-ad5c9c00-1edf-11eb-8d54-487d2262e8af.png)
 
-![image](https://user-images.githubusercontent.com/64818523/106609301-c7724d00-65a8-11eb-87d3-d6f03c693db6.png)
+- Deployment.yml 설정
 
-- order/kubernetes/Deployment.yml 설정
+![image](https://user-images.githubusercontent.com/73699193/98108902-12b08d00-1ee0-11eb-8f8a-3a3ea82a635c.png)
 
-![image](https://user-images.githubusercontent.com/64818523/106609409-dd800d80-65a8-11eb-8321-aa047e8a68aa.png)
-
-
-### product ConfigMap 설정
-  - product/src/main/resources/apllication.yml 설정
-
-  * default쪽
-  
-![image](https://user-images.githubusercontent.com/64818523/106609502-f8eb1880-65a8-11eb-96ed-8eeb1fc9f87c.png)
-
-  * docker 쪽
-  
-![image](https://user-images.githubusercontent.com/64818523/106609558-0bfde880-65a9-11eb-9b5a-240566adbad1.png)
-
-- product/kubernetes/Deployment.yml 설정
-
-![image](https://user-images.githubusercontent.com/64818523/106612752-c93e0f80-65ac-11eb-9509-9938f4ccf767.png)
-
-
-### config map 생성 후 조회
+- config map 생성 후 조회
 ```
-kubectl create configmap apiorderurl --from-literal=url=http://10.0.54.30:8080 --from-literal=fluentd-server-ip=10.xxx.xxx.xxx -n coffee
+kubectl create configmap apiurl --from-literal=url=http://pay:8080 --from-literal=fluentd-server-ip=10.xxx.xxx.xxx -n phone82
 ```
-![image](https://user-images.githubusercontent.com/64818523/106609630-1f10b880-65a9-11eb-9c1d-be9d65f03a1e.png)
-
-```
-kubectl create configmap apiproducturl --from-literal=url=http://10.0.164.216:8080 --from-literal=fluentd-server-ip=10.xxx.xxx.xxx -n coffee
-```
-![image](https://user-images.githubusercontent.com/64818523/106609694-3485e280-65a9-11eb-9b59-c0d4a2ba3aed.png)
+![image](https://user-images.githubusercontent.com/73699193/98107784-5bffdd00-1ede-11eb-8da6-82dbead0d64f.png)
 
 - 설정한 url로 주문 호출
 ```
-http POST localhost:8081/orders productName="Americano" qty=1
+http POST http://app:8080/orders item=dfdf1 qty=21
 ```
 
-![image](https://user-images.githubusercontent.com/75309297/106707026-e10ca680-6633-11eb-83fa-3bcc907389ad.png)
+![image](https://user-images.githubusercontent.com/73699193/98109319-b732cf00-1ee0-11eb-9e92-ad0e26e398ec.png)
 
 - configmap 삭제 후 app 서비스 재시작
 ```
-kubectl delete configmap apiorderurl -n coffee
-kubectl delete configmap apiproducturl -n coffee
-
-kubectl get pod/order-74c76b478-xx7n7 -n coffee -o yaml | kubectl replace --force -f-
-kubectl get pod/product-66ddb989b8-r82sm -n coffee -o yaml | kubectl replace --force -f-
+kubectl delete configmap apiurl -n phone82
+kubectl get pod/app-56f677d458-5gqf2 -n phone82 -o yaml | kubectl replace --force -f-
 ```
+![image](https://user-images.githubusercontent.com/73699193/98110005-cf571e00-1ee1-11eb-973f-2f4922f8833c.png)
 
 - configmap 삭제된 상태에서 주문 호출   
 ```
-kubectl exec -it httpie -- /bin/bash
-http POST http://10.0.101.221:8080/orders productName="Tea" qty=3
+http POST http://app:8080/orders item=dfdf2 qty=22
 ```
-![image](https://user-images.githubusercontent.com/64818523/106706737-765b6b00-6633-11eb-9e73-48aa1190acdb.png)
+![image](https://user-images.githubusercontent.com/73699193/98110323-42f92b00-1ee2-11eb-90f3-fe8044085e9d.png)
 
-- configmap 삭제된 상태에서 Pod와 deploy 상태 확인
-```
-kubectl get all -n coffee
-```
-![image](https://user-images.githubusercontent.com/64818523/106706899-b4588f00-6633-11eb-9670-169421b045ed.png)
+![image](https://user-images.githubusercontent.com/73699193/98110445-720f9c80-1ee2-11eb-851e-adcd1f2f7851.png)
 
-- Pod와 상태 상세 확인
-```
-kubectl get pod order-74c76b478-mlpf4 -o yaml -n coffee
-```
-![image](https://user-images.githubusercontent.com/64818523/106706929-c33f4180-6633-11eb-843c-535c0b37904d.png)
+![image](https://user-images.githubusercontent.com/73699193/98110782-f4985c00-1ee2-11eb-97a7-1fed3c6b042c.png)
+
 
 
 ## Self-healing (Liveness Probe)
 
+- store 서비스 정상 확인
+
+![image](https://user-images.githubusercontent.com/27958588/98096336-fb1cd880-1ece-11eb-9b99-3d704cd55fd2.jpg)
+
+
 - deployment.yml 에 Liveness Probe 옵션 추가
 ```
-cd ~/coffee/product/kubernetes
+cd ~/phone82/store/kubernetes
 vi deployment.yml
 
 (아래 설정 변경)
@@ -499,17 +540,13 @@ livenessProbe:
 	initialDelaySeconds: 5
 	periodSeconds: 5
 ```
-![image](https://user-images.githubusercontent.com/75309297/106708030-8f651b80-6635-11eb-979a-bee010a28e86.png)
+![image](https://user-images.githubusercontent.com/27958588/98096375-0839c780-1ecf-11eb-85fb-00e8252aa84a.jpg)
 
-- product pod에 liveness가 적용된 부분 확인
-```
-kubectl describe deploy product -n coffee
-```
-![image](https://user-images.githubusercontent.com/75309297/106708456-3f3a8900-6636-11eb-93af-07b754f2944a.png)
+- store pod에 liveness가 적용된 부분 확인
 
-- product 서비스의 liveness가 발동되어 5번 retry 시도 한 부분 확인
-```
-kubectl get pod -n coffee
-```
+![image](https://user-images.githubusercontent.com/27958588/98096393-0a9c2180-1ecf-11eb-8ac5-f6048160961d.jpg)
 
-![image](https://user-images.githubusercontent.com/75309297/106707672-f7ffc880-6634-11eb-9b35-032348772306.png)
+- store 서비스의 liveness가 발동되어 13번 retry 시도 한 부분 확인
+
+![image](https://user-images.githubusercontent.com/27958588/98096461-20a9e200-1ecf-11eb-8b02-364162baa355.jpg)
+
