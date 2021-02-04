@@ -21,7 +21,7 @@ public class Content {
     @PostPersist
     public void onPostPersist(){
         System.out.println("******** Content ********");
-        this.setStatus("Content Uploaded.");
+        this.setStatus("Uploaded");
         
         Uploaded uploaded = new Uploaded();
         uploaded.setId(this.getId());
@@ -41,7 +41,7 @@ public class Content {
         copyright.setContentId(this.getId());
         copyright.setArtistName(this.getCreatorName());
         copyright.setMusicTitle(this.getTitle());
-        copyright.setStatus("Copyright Approval Process Started.");
+        copyright.setStatus("Started");
         // mappings goes here
         ContentApplication.applicationContext.getBean(musicloud.external.CopyrightService.class)
             .approve(copyright);
@@ -51,7 +51,7 @@ public class Content {
 
     @PreRemove
     public void onPreRemove(){
-        this.setStatus("Content Deleted.");
+        this.setStatus("Deleted");
         Deleted deleted = new Deleted();
         BeanUtils.copyProperties(this, deleted);
         deleted.publishAfterCommit();
