@@ -19,14 +19,8 @@ public class Source {
     @PostPersist
     public void onPostPersist(){
         
-        try {
-            Thread.currentThread().sleep((long) (400 + Math.random() * 220));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        
-        if("Copyright Approved.".equals(status)) {
-            this.setStatus("Source Registered.");
+        if("Approved.".equals(status)) {
+            this.setStatus("Registered.");
             Registered registered = new Registered();
             BeanUtils.copyProperties(this, registered);
             registered.publishAfterCommit();
