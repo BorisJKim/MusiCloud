@@ -37,6 +37,10 @@ logging:
     org.springframework.cloud: debug
 server:
   port: 8083
+  
+api:
+  url:
+    source: http://localhost:8083
 ---
 
 spring:
@@ -62,3 +66,7 @@ spring:
         event-out:
           destination: musicloud
           contentType: application/json
+
+api:
+  url:
+    source: ${configurl}
