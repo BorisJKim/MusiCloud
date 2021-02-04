@@ -47,6 +47,7 @@ public class MypageViewHandler {
                 List<Mypage> mypageList = mypageRepository.findByContentId(approved.getContentId());
                 for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setCopyrightId(approved.getId());
                     mypage.setStatus(approved.getStatus());
                     // view 레파지 토리에 save
                     mypageRepository.save(mypage);
@@ -64,6 +65,7 @@ public class MypageViewHandler {
                 List<Mypage> mypageList = mypageRepository.findByContentId(registered.getContentId());
                 for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setSourceId(registered.getId());
                     mypage.setStatus(registered.getStatus());
                     // view 레파지 토리에 save
                     mypageRepository.save(mypage);
