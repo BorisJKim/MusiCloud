@@ -20,6 +20,12 @@ spec:
           image: musicloud.azurecr.io/mypage:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: configurl
+              valueFrom:
+                configMapKeyRef:
+                  name: apimypageurl
+                  key: url
           readinessProbe:
             httpGet:
               path: '/actuator/health'
