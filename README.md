@@ -221,18 +221,16 @@ http POST http://10.0.158.68:8080/contents creatorName="TIKITIK" title="The Song
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 
 
+copyright 가 approved 된 후에 source 서비스로 이를 알려주는 행위는 비동기식으로 처리하여 source 의 처리를 위하여 content upload 가 블로킹 되지 않도록 처리한다.
 
-결제(pay)가 이루어진 후에 대리점(store)으로 이를 알려주는 행위는 비 동기식으로 처리하여 대리점(store)의 처리를 위하여 결제주문이 블로킹 되지 않아도록 처리한다.
+- copyright 가 approved 되었다는 도메인 이벤트를 카프카로 송출한다. (Publish)
  
-- 결제승인이 되었다(payCompleted)는 도메인 이벤트를 카프카로 송출한다(Publish)
- 
-![image](https://user-images.githubusercontent.com/73699193/98075277-6f478400-1eaf-11eb-88c8-2b4a7736e56b.png)
+![image](https://user-images.githubusercontent.com/6468351/106908143-5f576e80-6742-11eb-8a81-4b5a43e9cea2.png)
 
-
-- 대리점(store)에서는 결제승인(payCompleted) 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다.
-- 주문접수(OrderReceive)는 송출된 결제승인(payCompleted) 정보를 store의 Repository에 저장한다.:
+- source 서비스에서는 copyright approved 이벤트에 대해서 이를 수신하여 자신의 정책을 처리하도록 PolicyHandler 를 구현한다.
+- source register 는 송출된 copyright approved 정보를 source repository 에 저장한다.
  
-![image](https://user-images.githubusercontent.com/73699193/98076059-e0d40200-1eb0-11eb-94ad-c4ea114cb3aa.png)
+![image](https://user-images.githubusercontent.com/6468351/106910662-c9711300-6744-11eb-9169-8c3bbd05455b.png)
 
 
 대리점(store)시스템은 주문(app)/결제(pay)와 완전히 분리되어있으며(sync transaction 없음), 이벤트 수신에 따라 처리되기 때문에, 대리점(store)이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다.(시간적 디커플링):
