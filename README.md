@@ -1,5 +1,9 @@
 # MusiCloud
-[Intensive Coursework : Winter School] Cloud App. Azure 2차수 Final 개별 과제 - MusiCloud
+( [Intensive Coursework : Winter School] Cloud App. Azure 2차수 Final 개별 과제 by 김범진 )
+
+MusiCloud 는 Creator 가 만드는 새로운 음악에 대한 저작권 승인과 음원 등록 절차 등을 쉽게 연결해줍니다.
+또한 새로운 음악이 아니라 Cover 및 2차 창작 Content 를 등록된 원곡 정보와 쉽게 연결하여,
+원작자의 허가 절차를 간소화함과 동시에 원작자와 Creator 들이 쉽게 함께 Content 를 느낄 수 있는 환경을 제공합니다.
 
 
 
@@ -23,16 +27,25 @@
     - [Self-healing (Liveness Probe)](#self-healing-liveness-probe)
 
 # 서비스 시나리오
- 1. 고객이 커피를 주문한다                                          - Order
- 2. 주문이 되면 제작팀에 주문이 전달 된다                            - Product
- 3. 주문과 동시에 커피 제작이 시작된다                               - Product
- 4. 제작이 되면 재고관리에 전달 된다                                 - Stock
- 5. 재고관리에 전달 되면 재고가 차감된다                             - Stock
- 6. 주문이 시작되면 고객은 진행 상황을 조회할 수 있다                 - Customer Center
- 7. 고객은 주문을 취소할 수 있다                                    - Order
- 8. 주문이 취소되면 제작이 취소 된다                                 - Product
- 9. 고객이 주문 상태를 조회 할 수 있다                               - Customer Center
-10. 고객은 모든 진행 내역을 조회 할 수 있다                          - Customer Center
+- 기능적 요구사항
+ 1. Creator 가 새로운 Content 를 Upload 한다.
+ 2. 저작권 서비스에서 저작권 승인 절차를 진행한다.
+ 3. 저작권 승인이 완료되면 음원 등록 내역이 음원 서비스에 전달된다.
+ 4. 음원 서비스에 음원 등록 내역이 도착하면 음원을 등록한다.
+ 5. 음원 등록이 완료되면 Creator 는 음원 등록 상태를 조회할 수 있다.
+ 6. Creator 는 Content 를 삭제할 수 있다.
+ 7. Content 가 삭제되면 저작권 서비스에서는 저작권을 해제한다.
+ 8. 저작권 해제 상태를 Creator 가 조회할 수 있다.
+ 9. Creator 는 Content 들의 모든 진행 상태를 조회 할 수 있다.
+- 비기능적 요구사항
+ 1. 트랜잭션
+    1. 저작권 승인이 되지 않은 음원은 등록되지 않아야 한다. > Sync 호출
+    2. Content 가 삭제되면 저작권이 해제되고 Content 정보에 없데이트가 되어야 한다. > SAGA, 보상 트랜잭션
+ 2. 장애격리
+    1. 음원 관리 시스템이 수행되지 않더라도 Content Upload 는 365일 24시간 받을 수 있어야 한다. > Async (event-driven), Eventual Consistency
+    2. 저작권 관리 시스템이 과중되면 Content Upload 를 잠시동안 받지 않고 저작권 승인을 잠시 후에 하도록 유도한다. > Circuit Breaker, Fallback
+ 3. 성능
+    1. Creator 가 모든 짆애 상태를 조회할 수 있도록 성능을 고려하여 별도의 View 로 구성한다. > CQRS
 
 # 체크포인트
 - Saga
