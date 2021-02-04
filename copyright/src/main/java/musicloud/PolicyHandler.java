@@ -28,7 +28,7 @@ public class PolicyHandler{
             
             Copyright copyright = new Copyright();
             copyright.setContentId(deleted.getId());
-            copyright.setStatus("Content Deleted.");
+            copyright.setStatus("Recovered");
             copyrightRepository.save(copyright);
         }
     }
