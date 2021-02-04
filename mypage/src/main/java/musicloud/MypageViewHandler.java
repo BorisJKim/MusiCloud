@@ -22,16 +22,16 @@ public class MypageViewHandler {
         try {
             if (uploaded.isMe()) {
                 // view 객체 생성
-                  = new ();
+                Mypage mypage  = new Mypage();
                 // view 객체에 이벤트의 Value 를 set 함
-                .setContentId(.getId());
-                .setCreatorName(.getCreatorName());
-                .setTitle(.getTitle());
-                .setType(.getType());
-                .setDescription(.getDescription());
-                .setStatus(.getStatus());
+                mypage.setContentId(uploaded.getId());
+                mypage.setCreatorName(uploaded.getCreatorName());
+                mypage.setTitle(uploaded.getTitle());
+                mypage.setType(uploaded.getType());
+                mypage.setDescription(uploaded.getDescription());
+                mypage.setStatus(uploaded.getStatus());
                 // view 레파지 토리에 save
-                Repository.save();
+                mypageRepository.save(mypage);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -44,11 +44,12 @@ public class MypageViewHandler {
         try {
             if (approved.isMe()) {
                 // view 객체 조회
-                List<> List = Repository.findByContentId(.getContentId());
-                for(  : List){
+                List<Mypage> mypageList = mypageRepository.findByContentId(approved.getContentId());
+                for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setStatus(approved.getStatus());
                     // view 레파지 토리에 save
-                    Repository.save();
+                    mypageRepository.save(mypage);
                 }
             }
         }catch (Exception e){
@@ -60,11 +61,12 @@ public class MypageViewHandler {
         try {
             if (registered.isMe()) {
                 // view 객체 조회
-                List<> List = Repository.findByContentId(.getContentId());
-                for(  : List){
+                List<Mypage> mypageList = mypageRepository.findByContentId(registered.getContentId());
+                for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setStatus(registered.getStatus());
                     // view 레파지 토리에 save
-                    Repository.save();
+                    mypageRepository.save(mypage);
                 }
             }
         }catch (Exception e){
@@ -76,11 +78,12 @@ public class MypageViewHandler {
         try {
             if (deleted.isMe()) {
                 // view 객체 조회
-                List<> List = Repository.findByContentId(.getId());
-                for(  : List){
+                List<Mypage> mypageList = mypageRepository.findByContentId(deleted.getId());
+                for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setStatus(deleted.getStatus());
                     // view 레파지 토리에 save
-                    Repository.save();
+                    mypageRepository.save(mypage);
                 }
             }
         }catch (Exception e){
@@ -92,11 +95,12 @@ public class MypageViewHandler {
         try {
             if (recovered.isMe()) {
                 // view 객체 조회
-                List<> List = Repository.findByContentId(.getContentId());
-                for(  : List){
+                List<Mypage> mypageList = mypageRepository.findByContentId(recovered.getContentId());
+                for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setStatus(recovered.getStatus());
                     // view 레파지 토리에 save
-                    Repository.save();
+                    mypageRepository.save(mypage);
                 }
             }
         }catch (Exception e){
