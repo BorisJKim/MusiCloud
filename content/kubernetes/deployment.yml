@@ -24,7 +24,7 @@ spec:
             - name: configurl
               valueFrom:
                 configMapKeyRef:
-                  name: apiurl
+                  name: apicontenturl
                   key: url
           readinessProbe:
             httpGet:
