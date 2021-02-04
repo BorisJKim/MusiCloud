@@ -69,7 +69,7 @@ MusiCloud 는 Creator 가 만드는 새로운 음악에 대한 저작권 승인�
 
 ## TO-BE 조직 (Vertically-Aligned)
 
-![image](https://user-images.githubusercontent.com/75309297/106628986-b1bb5280-65bd-11eb-9d2b-3bc6ce6d717f.png)
+![image](https://user-images.githubusercontent.com/6468351/106837027-9c3d4a00-66dd-11eb-89b4-53294005b1b2.png)
 
 ## 이벤트 스토밍 결과
 MSAEZ로 모델링한 이벤트스토밍 결과
