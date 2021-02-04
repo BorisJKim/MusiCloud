@@ -19,8 +19,8 @@ public class Source {
     @PostPersist
     public void onPostPersist(){
         
-        if("Approved.".equals(status)) {
-            this.setStatus("Registered.");
+        if("Approved".equals(status)) {
+            this.setStatus("Registered");
             Registered registered = new Registered();
             BeanUtils.copyProperties(this, registered);
             registered.publishAfterCommit();
