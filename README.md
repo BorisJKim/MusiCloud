@@ -183,62 +183,39 @@ http GET http://10.0.158.68:8080/copyrights
 
 ## 동기식 호출 과 Fallback 처리
 
-분석단계에서의 조건 중 하나로 주문(app)->결제(pay) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 
+분석단계에서의 조건 중 하나로 content -> copyright 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 
 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
 
-- 결제서비스를 호출하기 위하여 FeignClient 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
+- copyright 서비스를 호출하기 위하여 FeignClient 를 이용하여 Service 대행 인터페이스 (Proxy) 를 구현 
 ```
-# (app) external > PaymentService.java
-
-package phoneseller.external;
-
-@FeignClient(name="pay", url="${api.pay.url}")
-public interface PaymentService {
-
-    @RequestMapping(method= RequestMethod.POST, path="/payments")
-    public void pay(@RequestBody Payment payment);
-
-}
+# (content) external > CopyrightService.java
 ```
-![image](https://user-images.githubusercontent.com/73699193/98065833-b1190000-1e98-11eb-9e44-84d4961011ed.png)
+![image](https://user-images.githubusercontent.com/6468351/106904299-5fee0600-673e-11eb-962f-a35551b6f90d.png)
 
-
-- 주문을 받은 직후 결제를 요청하도록 처리
+- upload 직후 copyright approve 를 요청하도록 처리
 ```
-# (app) Order.java (Entity)
-
-    @PostPersist
-    public void onPostPersist(){
-
-       phoneseller.external.Payment payment = new phoneseller.external.Payment();
-        payment.setOrderId(this.getId());
-        payment.setProcess("Ordered");
-        
-        AppApplication.applicationContext.getBean(phoneseller.external.PaymentService.class)
-            .pay(payment);
-    }
+# (content) Content.java (Entity)
 ```
-![image](https://user-images.githubusercontent.com/73699193/98066539-a6f80100-1e9a-11eb-8dd8-bf213d90e5fb.png)
+![image](https://user-images.githubusercontent.com/6468351/106904779-eefb1e00-673e-11eb-91fb-2d062a2306bb.png)
 
-- 동기식 호출이 적용되서 결제 시스템이 장애가 나면 주문도 못받는다는 것을 확인:
+- 동기식 호출이 적용되서 copyright 시스템이 장애가 나면 upload 도 불가능한 것을 확인:
+```
+# copyright 서비스를 잠시 Down
+
+# upload (Fail)
+http POST http://10.0.158.68:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIK 1st Annyversary"
+```
+![image](https://user-images.githubusercontent.com/6468351/106905871-f40c9d00-673f-11eb-80c1-3ab6f56e08e0.png)
 
 ```
-#결제(pay) 서비스를 잠시 내려놓음 (ctrl+c)
-
-#주문하기(order)
-http http://localhost:8081/orders item=note20 qty=1   #Fail
-```
-![image](https://user-images.githubusercontent.com/73699193/98072284-04934a00-1ea9-11eb-9fad-40d3996e109f.png)
-
-```
-#결제(pay) 서비스 재기동
-cd pay
+# copyright 서비스 재기동
+cd copyright
 mvn spring-boot:run
 
-#주문하기(order)
-http http://localhost:8081/orders item=note21 qty=2   #Success
+# upload (Success)
+http POST http://10.0.158.68:8080/contents creatorName="TIKITIK" title="The Song Of Today" type="New Music" description="TIKITIK 1st Annyversary"
 ```
-![image](https://user-images.githubusercontent.com/73699193/98074359-9f8e2300-1ead-11eb-8854-0449a65ff55c.png)
+![image](https://user-images.githubusercontent.com/6468351/106906071-26b69580-6740-11eb-8250-d431c6264a87.png)
 
 
 
