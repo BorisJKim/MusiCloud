@@ -50,6 +50,7 @@ server:
 api:
   url:
     content: http://localhost:8081
+    copyright: http://localhost:8082
 ---
 
 spring:
@@ -88,3 +89,4 @@ hystrix:
 api:
   url:
     content: ${configurl}
+    copyright: ${configCopyrightUrl}
