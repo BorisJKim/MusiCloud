@@ -328,7 +328,7 @@ siege -c100 -t60S -r10 -v --content-type "application/json" 'http://content:8080
 
 ### 오토스케일 아웃
 
-- source 시스템에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
+- copyright 시스템에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
 
 ```
 # autocale out 설정
@@ -341,33 +341,30 @@ kubectl autoscale deploy source --min=1 --max=10 --cpu-percent=15 -n musicloud
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98100149-ce1ef480-1ed3-11eb-908e-a75b669d611d.png)
 
-
--
 - CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
 ```
 kubectl exec -it pod/siege -c siege -n musicloud -- /bin/bash
 siege -c100 -t120S -r10 -v --content-type "application/json" 'http://source:8080/sources POST {"artistName":"TIKITIK", "musicTitle":"The Song Of Today", "status":"registered", "contentId":"2"}'
 ```
-![image](https://user-images.githubusercontent.com/73699193/98102543-0d9b1000-1ed7-11eb-9cb6-91d7996fc1fd.png)
 
 - 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
 ```
 kubectl get deploy store -w -n phone82
 ```
+
 - 어느정도 시간이 흐른 후 스케일 아웃이 벌어지는 것을 확인할 수 있다. max=10 
 - 부하를 줄이니 늘어난 스케일이 점점 줄어들었다.
 
-![image](https://user-images.githubusercontent.com/73699193/98102926-92862980-1ed7-11eb-8f19-a673d72da580.png)
+![image](https://user-images.githubusercontent.com/6468351/106976328-8c843b00-679b-11eb-9b00-70c1a615b30a.png)
 
 - 다시 부하를 주고 확인하니 Availability가 높아진 것을 확인 할 수 있었다.
 
-![image](https://user-images.githubusercontent.com/73699193/98103249-14765280-1ed8-11eb-8c7c-9ea1c67e03cf.png)
+![image](https://user-images.githubusercontent.com/6468351/106976434-ba697f80-679b-11eb-82e1-b69c2b03b403.png)
 
 
 ## 무정지 재배포
 
 * 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscale 이나 CB 설정을 제거함
-
 
 - seige 로 배포작업 직전에 워크로드를 모니터링 함.
 ```
