@@ -376,6 +376,7 @@ kubectl apply -f kubernetes/deployment.yml
 ```
 
 - 신 버전이 먼저 올라온 뒤, 구 버전이 내려감
+
 ![image](https://user-images.githubusercontent.com/6468351/106978009-bd19a400-679e-11eb-99e1-8f838a9c1316.png)
 
 ![image](https://user-images.githubusercontent.com/6468351/106978102-e76b6180-679e-11eb-90af-cd44105b44aa.png)
@@ -385,6 +386,7 @@ kubectl apply -f kubernetes/deployment.yml
 ![image](https://user-images.githubusercontent.com/6468351/106978157-0669f380-679f-11eb-83ea-911b236f8881.png)
 
 - Availability: 100.00 % 확인
+
 ![image](https://user-images.githubusercontent.com/6468351/106978230-33b6a180-679f-11eb-8e59-a404b08641ac.png)
 
 
@@ -395,47 +397,25 @@ kubectl apply -f kubernetes/deployment.yml
 
 * default쪽
 
-![image](https://user-images.githubusercontent.com/73699193/98108335-1c85c080-1edf-11eb-9d0f-1f69e592bb1d.png)
+![image](https://user-images.githubusercontent.com/6468351/106978653-03233780-67a0-11eb-8980-c7614c642b97.png)
 
 * docker 쪽
 
-![image](https://user-images.githubusercontent.com/73699193/98108645-ad5c9c00-1edf-11eb-8d54-487d2262e8af.png)
+![image](https://user-images.githubusercontent.com/6468351/106978684-1209ea00-67a0-11eb-8059-626bc44b1c72.png)
 
 - Deployment.yml 설정
 
-![image](https://user-images.githubusercontent.com/73699193/98108902-12b08d00-1ee0-11eb-8f8a-3a3ea82a635c.png)
+![image](https://user-images.githubusercontent.com/6468351/106978724-2a7a0480-67a0-11eb-8e93-8773dd3c61fe.png)
 
 - config map 생성 후 조회
-```
-kubectl create configmap apiurl --from-literal=url=http://pay:8080 --from-literal=fluentd-server-ip=10.xxx.xxx.xxx -n phone82
-```
-![image](https://user-images.githubusercontent.com/73699193/98107784-5bffdd00-1ede-11eb-8da6-82dbead0d64f.png)
 
+![image](https://user-images.githubusercontent.com/6468351/106978847-72009080-67a0-11eb-8910-9c56ccf8de07.png)
+
+- 다른 서비스들에 대해서도 configmap 설정
 - 설정한 url로 주문 호출
 ```
-http POST http://app:8080/orders item=dfdf1 qty=21
+![image](https://user-images.githubusercontent.com/6468351/106979010-bee46700-67a0-11eb-85ed-18776c0e031d.png)
 ```
-
-![image](https://user-images.githubusercontent.com/73699193/98109319-b732cf00-1ee0-11eb-9e92-ad0e26e398ec.png)
-
-- configmap 삭제 후 app 서비스 재시작
-```
-kubectl delete configmap apiurl -n phone82
-kubectl get pod/app-56f677d458-5gqf2 -n phone82 -o yaml | kubectl replace --force -f-
-```
-![image](https://user-images.githubusercontent.com/73699193/98110005-cf571e00-1ee1-11eb-973f-2f4922f8833c.png)
-
-- configmap 삭제된 상태에서 주문 호출   
-```
-http POST http://app:8080/orders item=dfdf2 qty=22
-```
-![image](https://user-images.githubusercontent.com/73699193/98110323-42f92b00-1ee2-11eb-90f3-fe8044085e9d.png)
-
-![image](https://user-images.githubusercontent.com/73699193/98110445-720f9c80-1ee2-11eb-851e-adcd1f2f7851.png)
-
-![image](https://user-images.githubusercontent.com/73699193/98110782-f4985c00-1ee2-11eb-97a7-1fed3c6b042c.png)
-
-
 
 ## Self-healing (Liveness Probe)
 
