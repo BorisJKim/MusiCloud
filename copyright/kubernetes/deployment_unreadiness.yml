@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: copyright
+  namespace: musicloud
+  labels:
+    app: copyright
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: copyright
+  template:
+    metadata:
+      labels:
+        app: copyright
+    spec:
+      containers:
+        - name: copyright
+          image: musicloud.azurecr.io/copyright:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: configurl
+              valueFrom:
+                configMapKeyRef:
+                  name: apicopyrighturl
+                  key: url
+#          readinessProbe:
+#            httpGet:
+#              path: '/actuator/health'
+#              port: 8080
+#            initialDelaySeconds: 10
+#            timeoutSeconds: 2
+#            periodSeconds: 5
+#            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: '/actuator/health'
+              port: 8080
+            initialDelaySeconds: 120
+            timeoutSeconds: 2
+            periodSeconds: 5
+            failureThreshold: 5
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 200m
