@@ -326,7 +326,7 @@ siege -c100 -t60S -r10 -v --content-type "application/json" 'http://content:8080
 - CB 잘 적용됨을 확인
 
 
-### 오토스케일 아웃
+## 오토스케일 아웃
 
 - copyright 시스템에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
 
@@ -368,27 +368,24 @@ kubectl get deploy store -w -n phone82
 
 - seige 로 배포작업 직전에 워크로드를 모니터링 함.
 - deployment.yml에 readiness 옵션을 추가 
-
-![image](https://user-images.githubusercontent.com/73699193/98107176-75ecf000-1edd-11eb-88df-617c870b49fb.png)
+![image](https://user-images.githubusercontent.com/6468351/106977444-bcccd900-679d-11eb-9a3f-d59d004f36fb.png)
 
 - readiness적용된 deployment.yml 적용
-
 ```
 kubectl apply -f kubernetes/deployment.yml
 ```
-- 새로운 버전의 이미지로 교체
-```
-cd acr
-az acr build --registry admin02 --image admin02.azurecr.io/store:v4 .
-kubectl set image deploy store store=admin02.azurecr.io/store:v4 -n phone82
-```
-- 기존 버전과 새 버전의 store pod 공존 중
 
-![image](https://user-images.githubusercontent.com/73699193/98106161-65884580-1edc-11eb-9540-17a3c9bdebf3.png)
+- 신 버전이 먼저 올라온 뒤, 구 버전이 내려감
+![image](https://user-images.githubusercontent.com/6468351/106978009-bd19a400-679e-11eb-99e1-8f838a9c1316.png)
+
+![image](https://user-images.githubusercontent.com/6468351/106978102-e76b6180-679e-11eb-90af-cd44105b44aa.png)
+
+![image](https://user-images.githubusercontent.com/6468351/106978133-f8b46e00-679e-11eb-92d1-32b9fda3dc91.png)
+
+![image](https://user-images.githubusercontent.com/6468351/106978157-0669f380-679f-11eb-83ea-911b236f8881.png)
 
 - Availability: 100.00 % 확인
-
-![image](https://user-images.githubusercontent.com/73699193/98106524-c152ce80-1edc-11eb-8e0f-3731ca2f709d.png)
+![image](https://user-images.githubusercontent.com/6468351/106978230-33b6a180-679f-11eb-8e59-a404b08641ac.png)
 
 
 
