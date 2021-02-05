@@ -268,15 +268,18 @@ readiness 설정 (무정지 배포)
 liveness 설정 (self-healing)
 resource 설정 (autoscaling)
 ```
-![image](https://user-images.githubusercontent.com/73699193/98092861-8182eb80-1eca-11eb-87c5-afa22140ebad.png)
+![image](https://user-images.githubusercontent.com/6468351/106973043-63f94280-6795-11eb-8d18-524285be085f.png)
 
 - deployment.yml로 서비스 배포
 ```
 cd content
 kubectl apply -f kubernetes/deployment.yml
 ```
-
+- copyright, source, mypage 에서도 동일하게 배포
 - gateway 의 경우 deployment.yml 이 없으므로 따로 배포
+```
+kubectl create deploy gateway --image=musicloud.azurecr.io/gateway:latest -n musicloud
+```
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
