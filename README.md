@@ -243,7 +243,7 @@ http POST http://10.0.158.68:8080/contents creatorName="TIKITIK" title="The Song
 # 상태 확인
 http GET http://10.0.158.68:8080/contents    # 상태값이 'Registered' 가 아닌 'Approved' 에서 멈춤을 확인
 ```
-![image](https://user-images.githubusercontent.com/73699193/98078301-2b577d80-1eb5-11eb-9d89-7c03a3fa27dd.png)
+![image](https://user-images.githubusercontent.com/6468351/106972695-b1c17b00-6794-11eb-833f-44c54e954584.png)
 ```
 # source 서비스 기동
 cd source
@@ -252,7 +252,7 @@ mvn spring-boot:run
 # 상태 확인
 http GET http://localhost:8081/contents     # 'Approved' 였던 상태값이 'Registered'로 변경된 것을 확인
 ```
-![image](https://user-images.githubusercontent.com/73699193/98078837-2cd57580-1eb6-11eb-8850-a8c621410d61.png)
+![image](https://user-images.githubusercontent.com/6468351/106972768-dfa6bf80-6794-11eb-8e69-21fb36ad4c8f.png)
 
 # 운영
 
