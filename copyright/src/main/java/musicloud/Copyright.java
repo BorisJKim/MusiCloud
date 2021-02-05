@@ -2,6 +2,9 @@ package musicloud;
 
 import javax.persistence.*;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 import java.util.List;
 
 @Entity
@@ -20,15 +23,22 @@ public class Copyright {
     public void onPostPersist(){
         if("Uploaded".equals(status)) {
             
+            Approved approved = new Approved();
+            BeanUtils.copyProperties(this, approved);
+            
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void beforeCommit(boolean readOnly) {
+                    approved.publish();
+                }
+            });
+            
             try {
-                Thread.currentThread().sleep((long) (5000 + Math.random() * 220));
+                Thread.currentThread().sleep((long) (400 + Math.random() * 220));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             
-            Approved approved = new Approved();
-            BeanUtils.copyProperties(this, approved);
-            approved.publish();
         }
         else if("Deleted".equals(status)) {
             this.setStatus("Recovered");
