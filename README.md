@@ -190,7 +190,7 @@ http GET http://10.0.158.68:8080/copyrights
 ```
 # (content) external > CopyrightService.java
 ```
-![image](https://user-images.githubusercontent.com/6468351/106904299-5fee0600-673e-11eb-962f-a35551b6f90d.png)
+![image](https://user-images.githubusercontent.com/6468351/106972398-2516bd00-6794-11eb-9100-4a3b63348684.png)
 
 - upload 직후 copyright approve 를 요청하도록 처리
 ```
