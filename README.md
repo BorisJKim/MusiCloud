@@ -339,7 +339,7 @@ source > deployment.yml 설정
 ```
 kubectl autoscale deploy source --min=1 --max=10 --cpu-percent=15 -n musicloud
 ```
-![image](https://user-images.githubusercontent.com/73699193/98100149-ce1ef480-1ed3-11eb-908e-a75b669d611d.png)
+![image](https://user-images.githubusercontent.com/6468351/106976504-df5df280-679b-11eb-80b3-a5369fa289e4.png)
 
 - CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
 ```
