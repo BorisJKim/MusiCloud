@@ -425,14 +425,6 @@ kubectl apply -f kubernetes/deployment.yml
 ![image](https://user-images.githubusercontent.com/6468351/106979346-7e391d80-67a1-11eb-86bd-f016be51bbb5.png)
 
 - deployment.yml 에 Liveness Probe 옵션 추가
-```
-(아래 설정 변경)
-livenessProbe:
-	tcpSocket:
-	  port: 8081
-	initialDelaySeconds: 5
-	periodSeconds: 5
-```
 
 ![image](https://user-images.githubusercontent.com/6468351/106979419-9e68dc80-67a1-11eb-9a84-988a609bb81c.png)
 
